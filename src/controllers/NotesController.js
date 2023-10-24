@@ -4,7 +4,9 @@ const knex = require("../database/knex");
 
 class NotesController {
   async index(request, response) {
-    const { user_id, title, tags } = request.query;
+    const { title, tags } = request.query;
+
+    const user_id = request.user.id;
 
     let notes;
 
@@ -31,17 +33,6 @@ class NotesController {
         .orderBy("notes.id", "asc")
         .groupBy("notes.id");
 
-      // const repeatedIds = new Set();
-      // const repeatedResults = await query;
-      // return response.json(repeatedResults);
-      // const uniqueArray = repeatedResults.filter((tag) => {
-      //   if (repeatedIds.has(tag.id)) {
-      //     return false;
-      //   }
-      //   repeatedIds.add(tag.id);
-      //   return true;
-      // });
-
       notes = await query;
     } else {
       notes = await knex("notes")
@@ -64,7 +55,7 @@ class NotesController {
 
   async create(request, response) {
     const { title, description, tags, links } = request.body;
-    const { user_id } = request.params;
+    const user_id = request.user.id;
 
     const note_id = await knex("notes").insert({
       title,
